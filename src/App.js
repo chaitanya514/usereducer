@@ -1,25 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useReducer, useRef } from 'react';
 
+import './App.css';
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'add':
+      return [
+        ...state,
+        {
+          id: state.length,
+          name: action.name
+        }
+      ]
+    case 'remove':
+      return [
+        state.filter((id) => id !== action.id)
+      ]
+
+    case 'clear':
+      return []
+
+
+    default:
+      return state;
+  }
+
+
+}
 function App() {
+  const inputRef = useRef();
+  const [items, dispatch] = useReducer(reducer, [])
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    dispatch({
+      type: 'add',
+      name: inputRef.current.value
+    });
+    inputRef.current.value = '';
+
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <form onSubmit={handleSubmit}>
+        <input ref={inputRef} /> <br />
+      </form>
+
+      <button onClick={() => dispatch({ type: 'clear' })}>
+        Clear List
+          </button>
+
+      <ul>
+        {items.map((item, index) => (
+          <li key={item.id}>
+            <button> {item.name}</button>
+            <button
+              onClick={(id) => dispatch({ type: 'remove', id })}
+            >
+              X
+            </button>
+          </li>
+        ))}
+
+      </ul>
+
+
     </div>
+
   );
 }
 
